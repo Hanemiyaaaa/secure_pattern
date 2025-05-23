@@ -1,0 +1,6 @@
+{
+  "data_storage": "unassigned",
+  "data_encryption": "cloud_provider",
+  "access_control": "restaurant_owner",
+  "incident_response": "unassigned"
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cloud Responsibility</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    #registerModal { display: none; position: fixed; top: 20%; left: 35%; background: #eee; padding: 20px; border: 1px solid #333; }
+  </style>
+</head>
+<body>
+  <h1>Вход</h1>
+  <input id="user" placeholder="Логин">
+  <input id="pass" type="password" placeholder="Пароль">
+  <button onclick="login()">Войти</button>
+  <button onclick="showRegister()">Зарегистрироваться</button>
+  <p id="status"></p>
+  <hr>
+  <h2>Политика</h2>
+  <button onclick="loadPolicy()">Загрузить политику</button>
+  <button onclick="checkGap()">Проверить ответственность</button>
+  <pre id="output"></pre>
+
+  <!-- Регистрация -->
+  <div id="registerModal">
+    <h3>Регистрация</h3>
+    <input id="regUser" placeholder="Логин">
+    <input id="regPass" type="password" placeholder="Пароль">
+    <button onclick="register()">Создать</button>
+    <button onclick="hideRegister()">Отмена</button>
+    <p id="regStatus"></p>
+  </div>
+
+  <script>
+    let token = "";
+
+    function showRegister() {
+      document.getElementById("registerModal").style.display = "block";
+    }
+    function hideRegister() {
+      document.getElementById("registerModal").style.display = "none";
+    }
+
+    async function register() {
+      const username = document.getElementById("regUser").value;
+      const password = document.getElementById("regPass").value;
+      const res = await fetch('/register', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      document.getElementById("regStatus").innerText = data.msg || data.detail;
+    }
+
+    async function login() {
+      const username = document.getElementById("user").value;
+      const password = document.getElementById("pass").value;
+      const res = await fetch('/login', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.token) {
+        token = data.token;
+        document.getElementById("status").innerText = "Успешный вход.";
+      } else {
+        document.getElementById("status").innerText = data.detail || "Ошибка входа.";
+      }
+    }
+
+    async function loadPolicy() {
+      const res = await fetch('/policy', {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const data = await res.json();
+      document.getElementById("output").innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function checkGap() {
+      const res = await fetch('/responsibility_gap', {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const data = await res.json();
+      const gaps = data.unassigned;
+      document.getElementById("output").innerText = gaps.length
+        ? "Неопределено: " + gaps.join(", ")
+        : "Ответственность распределена полностью ✔";
+    }
+  </script>
+</body>
+</html>

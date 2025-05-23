@@ -1,0 +1,3 @@
+Unauthorized access attempt by user 'beaver' to endpoint '/responsibility_gap'
+Unauthorized access attempt by user 'beaver' to endpoint '/responsibility_gap'
+Unauthorized access attempt by user 'beaver' to endpoint '/responsibility_gap'
